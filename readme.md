@@ -1,6 +1,6 @@
-Color Match
+p5.js Doodles
 ===========
 
 Description
 -----------
-Some kind of rando color match game I wrote to "learn" [p5.js](p5js.org).
+Collection of rando stuff I wrote while playing with [p5.js](p5js.org).
