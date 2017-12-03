@@ -76,37 +76,66 @@ function loadField(blockRegistry) {
 	}
 }
 
+var matcher = {
+	left: function(row, col, color) {
+		var match = col > 0;
+		match = match && blockRegistry[col-1][row] != null;
+		match = match && blockRegistry[col-1][row].color == color;
+		return match;
+	},
+	right: function(row, col, color) {
+		var match = col < columns - 1;
+		match = match && blockRegistry[col+1][row] != null;
+		match = match && blockRegistry[col+1][row].color == color;
+		return match;
+	},
+	above: function(row, col, color) {
+		var match = row > 0;
+		match = match && blockRegistry[col][row-1] != null;
+		match = match && blockRegistry[col][row-1].color == color;
+		return match;
+	},
+	below: function(row, col, color) {
+		var match = row > 0;
+		match = match && blockRegistry[col][row+1] != null;
+		match = match && blockRegistry[col][row+1].color == color;
+		return match;
+	},
+	any : function(row, col, color) {
+		var left = this.left(row, col, color);
+		var right = this.right(row, col, color);
+		var above = this.above(row, col, color);
+		var below = this.below(row, col, color);
+		return !!(left + right + above + below);
+	}
+}
+
 var removeBlocks = function(col, row) {
 	var matches = false;
 	var block = blockRegistry[col][row];
 	blockRegistry[col][row] = null;
 
-	//left
-	if (col > 0 && blockRegistry[col-1][row] != null && blockRegistry[col-1][row].color == block.color) {
+	if (matcher.left(row, col, block.color)) {
 		matches = true;
 		removeBlocks(col-1, row);
 	}
 	
-	//right
-	if (col < columns - 1 && blockRegistry[col+1][row] != null && blockRegistry[col+1][row].color == block.color) {
+	if (matcher.right(row, col, block.color)) {
 		matches = true;
 		removeBlocks(col+1, row);
 	}
 	
-	//top
-	if (row > 0 && blockRegistry[col][row-1] != null && blockRegistry[col][row-1].color == block.color) {
+	if (matcher.above(row, col, block.color)) {
 		matches = true;
 		removeBlocks(col, row-1);
 	}
 	
-	//bottom
-	if (row > 0 && blockRegistry[col][row+1] != null && blockRegistry[col][row+1].color == block.color) {
+	if (matcher.below(row, col, block.color)) {
 		matches = true;
 		removeBlocks(col, row+1);
 	}
 
 	delete block;
-
 }
 
 function mouseClicked() {
@@ -120,7 +149,8 @@ function mouseClicked() {
 	var col = (mouseX - (mouseX % size)) / size;
 	var row = (mouseY - (mouseY % size)) / size;
 
-	if (blockRegistry[col][row] != null) {
+	var block = blockRegistry[col][row];
+	if (block != null && matcher.any(row, col, block.color)) {
 		removeBlocks(col, row);
 		mouseEnabled = false;
 		current = 0;
