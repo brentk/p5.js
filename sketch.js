@@ -5,12 +5,11 @@ var height = 1;
 var tick = 200;
 var last = 0;
 var current = 0;
-
 var columns = 10;
-
 var mouseEnabled = true;
-
 var blockRegistry = [];
+var score = 0;
+var tickScore = 0;
 
 var Block = function(color) {
 	this.color = color;
@@ -135,6 +134,7 @@ var removeBlocks = function(col, row) {
 		removeBlocks(col, row+1);
 	}
 
+	tickScore += 1;
 	delete block;
 }
 
@@ -155,6 +155,9 @@ function mouseClicked() {
 		mouseEnabled = false;
 		current = 0;
 	}
+
+	score += tickScore;
+	tickScore = 0;
 }
 
 function setup() {
@@ -172,7 +175,6 @@ function draw() {
 	last = millis();
 
 	fill(255);
-	stroke(0);
 	rect(0, 0, width-1, height-1);
 
 
@@ -182,13 +184,20 @@ function draw() {
 			var block = col[y];
 
 			if (block != null) {	
+				strokeWeight(3);
 				stroke(0);
-				
 				fill(colors[block.color].r, colors[block.color].g, colors[block.color].b);
 				rect(x*size, y*size, size, size);
 			}
 		}
 	}
+
+
+	textSize(32);
+	strokeWeight(5);
+	stroke(0);
+	fill(255);
+	text(score, 10, 40);
 
 	if(current > tick) {
 		current = 0;
