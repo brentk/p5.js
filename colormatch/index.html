@@ -1,11 +1,42 @@
 <html>
 	<head>
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/addons/p5.dom.min.js"></script>
 		<script src="sketch.js"></script>
-	</head>
 
+		<style>
+			body {
+				text-align: center;
+			}
+
+			.btn {
+				margin-top: 12px;
+			}
+		</style>
+
+	</head>
 	<body>
+		<div id="canvas-parent"></div>
+		<button id="ai-play" class="btn btn-primary"><i id="ai-icon" class="fa fa-user"></i> <span id="ai-button-text">Start A.I. Player</a></button>
 	</body>
+
+	<script>
+		document.getElementById("ai-play").addEventListener("click", function() {
+			if (aiPlay) {
+				document.getElementById("ai-button-text").innerHTML = "Start A.I. Player";
+				document.getElementById("ai-icon").classList.remove("fa-ban");
+				document.getElementById("ai-icon").classList.add("fa-user");
+				aiPlay = false;
+			} else {
+				document.getElementById("ai-button-text").innerHTML = "Stop A.I. Player";
+				document.getElementById("ai-icon").classList.remove("fa-user");
+				document.getElementById("ai-icon").classList.add("fa-ban");
+				aiPlay = true;
+			}
+		});
+	</script>
+
 </html>
 

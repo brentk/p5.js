@@ -1,3 +1,5 @@
+var aiPlay = false;
+var canvas = null;
 var angle = 0;
 var radius = 30;
 var width = 1;
@@ -118,17 +120,17 @@ var removeBlocks = function(col, row) {
 		matches = true;
 		removeBlocks(col-1, row);
 	}
-	
+
 	if (matcher.right(row, col, block.color)) {
 		matches = true;
 		removeBlocks(col+1, row);
 	}
-	
+
 	if (matcher.above(row, col, block.color)) {
 		matches = true;
 		removeBlocks(col, row-1);
 	}
-	
+
 	if (matcher.below(row, col, block.color)) {
 		matches = true;
 		removeBlocks(col, row+1);
@@ -139,6 +141,12 @@ var removeBlocks = function(col, row) {
 }
 
 function mouseClicked() {
+	processMouseClick(mouseX, mouseY);
+}
+
+function processMouseClick(mouseX, mouseY) {
+	var blocksRemoved = false;
+
 	if (mouseX > width || mouseX < 0) {
 		return;
 	}
@@ -151,6 +159,7 @@ function mouseClicked() {
 
 	var block = blockRegistry[col][row];
 	if (block != null && matcher.any(row, col, block.color)) {
+		blocksRemoved = true;
 		removeBlocks(col, row);
 		mouseEnabled = false;
 		current = 0;
@@ -158,6 +167,23 @@ function mouseClicked() {
 
 	score += tickScore;
 	tickScore = 0;
+
+	return blocksRemoved;
+}
+
+function formatNumber(number) {
+	number = String(number);
+	var result = "";
+	var count = 0;
+	for(i = number.length; i > 0; i--) {
+		count++;
+		if (count == 4) {
+			result = "," + result;
+			count = 0;
+		}
+		result = number[i-1] + result;
+	}
+	return result;
 }
 
 function setup() {
@@ -165,7 +191,8 @@ function setup() {
 	height = 400;
 	size = width/columns;
 
-	createCanvas(width, height);
+	canvas = createCanvas(width, height);
+	canvas.parent("canvas-parent");
 	initField(blockRegistry);
 	loadField(blockRegistry);
 }
@@ -183,7 +210,7 @@ function draw() {
 		for (var y in blockRegistry[x]) {
 			var block = col[y];
 
-			if (block != null) {	
+			if (block != null) {
 				strokeWeight(3);
 				stroke(0);
 				fill(colors[block.color].r, colors[block.color].g, colors[block.color].b);
@@ -192,17 +219,41 @@ function draw() {
 		}
 	}
 
-
 	textSize(32);
 	strokeWeight(5);
 	stroke(0);
 	fill(255);
-	text(score, 10, 40);
+	text(formatNumber(score), 10, 40);
 
-	if(current > tick) {
+	if(current >= tick) {
 		current = 0;
 		phys(blockRegistry);
 		loadField(blockRegistry);
 		mouseEnabled = true;
+
+		var found = false;
+		for(var x = 0; x < blockRegistry.length; x++) {
+			for(var y = 0; y < blockRegistry[x].length; y++) {
+				block = blockRegistry[x][y];
+
+				if (block != null) {
+					found = matcher.any(y, x, block.color);
+					if (found && aiPlay) {
+						processMouseClick(x * size, y * size);
+						fill(255);
+						rect ((x * size) + (size/2), (y * size) + (size/2), 10, 10);
+					}
+				}
+				if (found) { break; }
+			}
+			if (found) { break; }
+		}
+
+		if (!found) {
+			textSize(72);
+			strokeWeight(10);
+			text("NO MOVES LEFT", 110, 225);
+		}
+
 	}
 }
