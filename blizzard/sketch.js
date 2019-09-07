@@ -1,10 +1,16 @@
 let canvas = null;
-let height = 500;
-let width = 800;
+let width = window.innerWidth;
+let height = window.innerHeight;
 let backgroundColor = 126;
 let flakeCount = 30;
 let flakes = [];
 let tick = 0;
+
+function windowResized() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    resizeCanvas(width, height);
+}
 
 function rand(low, high) {
     return Math.random() * (high - low) + low;
@@ -53,7 +59,7 @@ function setup() {
     }
 
     //prime the animation so everything doesn't start at once
-    for(let i = 0; i < 50; i++) {
+    for(let i = 0; i < 500; i++) {
         for(let j = 0; j < flakes.length; j++) {
             updateFlake(flakes[j]);
         }
